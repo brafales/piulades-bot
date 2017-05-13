@@ -1,0 +1,51 @@
+{
+	"ImportPath": "github.com/brafales/piulades-bot",
+	"GoVersion": "go1.7",
+	"GodepVersion": "v79",
+	"Deps": [
+		{
+			"ImportPath": "github.com/cenkalti/backoff",
+			"Comment": "v1.0.0-19-g5d150e7",
+			"Rev": "5d150e7eec023ce7a124856b37c68e54b4050ac7"
+		},
+		{
+			"ImportPath": "github.com/dghubble/go-twitter/twitter",
+			"Rev": "2bdbe500add529557f5c9670fe8c904b1b1f08aa"
+		},
+		{
+			"ImportPath": "github.com/dghubble/sling",
+			"Comment": "v1.1.0-4-gbbfb829",
+			"Rev": "bbfb8293bd33a6baad33d718aacf66ef73a29f30"
+		},
+		{
+			"ImportPath": "github.com/go-telegram-bot-api/telegram-bot-api",
+			"Comment": "v4.6-25-g9f98d19",
+			"Rev": "9f98d19464ddfabe93b1939a64538e4b6fbb9ad0"
+		},
+		{
+			"ImportPath": "github.com/google/go-querystring/query",
+			"Rev": "53e6ce116135b80d037921a7fdd5138cf32d7a8a"
+		},
+		{
+			"ImportPath": "github.com/technoweenie/multipartstreamer",
+			"Comment": "v1.0.1",
+			"Rev": "a90a01d73ae432e2611d178c18367fbaa13e0154"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "84f0e6f92b10139f986b1756e149a7d9de270cdc"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2",
+			"Rev": "ad516a297a9f2a74ecc244861b298c94bdd28b9d"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2/clientcredentials",
+			"Rev": "ad516a297a9f2a74ecc244861b298c94bdd28b9d"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2/internal",
+			"Rev": "ad516a297a9f2a74ecc244861b298c94bdd28b9d"
+		}
+	]
+}
