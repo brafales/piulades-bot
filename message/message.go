@@ -3,6 +3,8 @@ package message
 import (
 	"fmt"
 
+	"github.com/brafales/piulades-bot/pinchito"
+
 	"github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
@@ -26,4 +28,9 @@ func Build(chatID int64, user string, images [][]byte, text string) ([]tgbotapi.
 	}
 	msg := tgbotapi.NewMessage(chatID, text)
 	return []tgbotapi.Chattable{msg}, nil
+}
+
+func BuildLog(chatID int64, log pinchito.Log) tgbotapi.Chattable {
+	msg := tgbotapi.NewMessage(chatID, log.Body())
+	return msg
 }
