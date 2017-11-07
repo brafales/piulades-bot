@@ -11,9 +11,8 @@ import (
 )
 
 type Tapeta struct {
-	next   Handler
-	chatID int64
-	bot    *tgbotapi.BotAPI
+	ChatID int64
+	Bot    *tgbotapi.BotAPI
 }
 
 func (t *Tapeta) Handle(update tgbotapi.Update) error {
@@ -24,10 +23,10 @@ func (t *Tapeta) Handle(update tgbotapi.Update) error {
 
 	if match {
 		log := pinchito.Log{}
-		telegramMessage := message.BuildLog(t.chatID, log)
-		t.bot.Send(telegramMessage)
+		telegramMessage := message.BuildLog(t.ChatID, log)
+		t.Bot.Send(telegramMessage)
 	}
-	return t.next.Handle(update)
+	return nil
 }
 
 func (t *Tapeta) match(s string) (bool, error) {
