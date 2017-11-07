@@ -30,5 +30,5 @@ func (t *Tapeta) Handle(update tgbotapi.Update) error {
 }
 
 func (t *Tapeta) match(s string) (bool, error) {
-	return regexp.MatchString("^tapeta$", s)
+	return regexp.MatchString("^/tapeta$", s)
 }
