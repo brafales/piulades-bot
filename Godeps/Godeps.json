@@ -10,7 +10,7 @@
 		},
 		{
 			"ImportPath": "github.com/dghubble/go-twitter/twitter",
-			"Rev": "2bdbe500add529557f5c9670fe8c904b1b1f08aa"
+			"Rev": "c4115fa44a928413e0b857e0eb47376ffde3a61a"
 		},
 		{
 			"ImportPath": "github.com/dghubble/sling",

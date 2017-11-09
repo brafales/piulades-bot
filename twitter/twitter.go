@@ -64,7 +64,10 @@ func NewTweet(apiTweet *twitterAPI.Tweet, imageDownloader ImageDownloader) Tweet
 
 //GetTwit returns a Tweet associated to the statusID
 func (t Client) GetTwit(statusID int64) (Tweet, error) {
-	apiTweet, _, err := t.client.Statuses.Show(statusID, nil)
+	params := &twitterAPI.StatusShowParams{
+		TweetMode: "extended",
+	}
+	apiTweet, _, err := t.client.Statuses.Show(statusID, params)
 	if err == nil {
 		return NewTweet(apiTweet, DefaultImageDownloader{}), nil
 	}
