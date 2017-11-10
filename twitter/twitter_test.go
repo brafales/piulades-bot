@@ -143,9 +143,9 @@ func TestReturnsTweetPrintableText(t *testing.T) {
 		ScreenName: name,
 	}
 	apiTweet := twitterAPI.Tweet{
-		User: &user,
-		ID:   ID,
-		Text: text,
+		User:     &user,
+		ID:       ID,
+		FullText: text,
 	}
 
 	tweet := twitter.NewTweet(&apiTweet, goodTestImageDownloader{})
