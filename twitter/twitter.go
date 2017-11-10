@@ -80,7 +80,7 @@ func (t Tweet) PrintableText(user string) string {
 		user,
 		t.apiTweet.User.ScreenName,
 		t.apiTweet.ID,
-		t.apiTweet.Text)
+		t.apiTweet.FullText)
 }
 
 //URL returns the original tweet URL
