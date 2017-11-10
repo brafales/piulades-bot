@@ -22,7 +22,10 @@ func (t *Tapeta) Handle(update tgbotapi.Update) error {
 	}
 
 	if match {
-		log := pinchito.Log{}
+		log, err := pinchito.Tapeta()
+		if err != nil {
+			return err
+		}
 		telegramMessage := message.BuildLog(t.ChatID, log)
 		t.Bot.Send(telegramMessage)
 	}
