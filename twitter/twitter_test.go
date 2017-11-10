@@ -150,7 +150,7 @@ func TestReturnsTweetPrintableText(t *testing.T) {
 
 	tweet := twitter.NewTweet(&apiTweet, goodTestImageDownloader{})
 
-	exp := fmt.Sprintf("Tweet enviat per [%s]: https://twitter.com/%s/status/%d - %s",
+	exp := fmt.Sprintf("Tweet enviat per [%s]: https://twitter.com/%s/status/%d\n%s",
 		username,
 		name,
 		ID,

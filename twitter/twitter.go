@@ -76,7 +76,7 @@ func (t Client) GetTwit(statusID int64) (Tweet, error) {
 
 //PrintableText returns a string with the tweet information
 func (t Tweet) PrintableText(user string) string {
-	return fmt.Sprintf("Tweet enviat per [%s]: https://twitter.com/%s/status/%d - %s",
+	return fmt.Sprintf("Tweet enviat per [%s]: https://twitter.com/%s/status/%d\n%s",
 		user,
 		t.apiTweet.User.ScreenName,
 		t.apiTweet.ID,
