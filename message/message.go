@@ -31,6 +31,6 @@ func Build(chatID int64, user string, images [][]byte, text string) ([]tgbotapi.
 }
 
 func BuildLog(chatID int64, log pinchito.Log) tgbotapi.Chattable {
-	msg := tgbotapi.NewMessage(chatID, log.Body())
+	msg := tgbotapi.NewMessage(chatID, log.PrettyText())
 	return msg
 }
