@@ -29,5 +29,5 @@ func (l *Log) TelegramText() string {
 }
 
 func (l *Log) dateAndAuthor() string {
-	return fmt.Sprintf("Enviat el %s per %s", l.Dia, l.Autor)
+	return fmt.Sprintf("Enviat el %s per %s", l.Dia, l.Autor.Login)
 }
