@@ -38,7 +38,10 @@ func (s *Search) Handle(update tgbotapi.Update) error {
 func (search *Search) match(s string) string {
 	re := regexp.MustCompile("^/search ([\\w\\s\\.,-\\?!]+)$")
 	matches := re.FindStringSubmatch(s)
-	if matches != nil || len(matches) < 2 {
+	if matches == nil {
+		return ""
+	}
+	if len(matches) < 2 {
 		return ""
 	}
 	return matches[1]
