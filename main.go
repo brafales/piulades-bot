@@ -28,7 +28,8 @@ func main() {
 
 	twitterHandler := &handler.Twitter{Bot: bot, ChatID: config.ChatID, TwitterClient: twitterClient}
 	tapetaHandler := &handler.Tapeta{Bot: bot, ChatID: config.ChatID}
-	handlers := []handler.Handler{twitterHandler, tapetaHandler}
+	searchHandler := &handler.Search{Bot: bot, ChatID: config.ChatID}
+	handlers := []handler.Handler{twitterHandler, tapetaHandler, searchHandler}
 
 	for update := range updates {
 		for _, h := range handlers {
