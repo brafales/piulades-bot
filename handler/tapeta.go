@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log"
 	"regexp"
 
 	"github.com/brafales/piulades-bot/pinchito"
@@ -16,19 +17,24 @@ type Tapeta struct {
 }
 
 func (t *Tapeta) Handle(update tgbotapi.Update) error {
+	log.Println("Handling with Tapeta")
 	match, err := t.match(update.Message.Text)
 	if err != nil {
 		return err
 	}
 
-	if match {
-		log, err := pinchito.Tapeta()
-		if err != nil {
-			return err
-		}
-		telegramMessage := message.BuildLog(t.ChatID, log)
-		t.Bot.Send(telegramMessage)
+	if !match {
+		log.Println("No Tapeta command found")
+		return nil
 	}
+
+	log, err := pinchito.Tapeta()
+	if err != nil {
+		return err
+	}
+	telegramMessage := message.BuildLog(t.ChatID, log)
+	t.Bot.Send(telegramMessage)
+
 	return nil
 }
 

@@ -31,6 +31,7 @@ func main() {
 	searchHandler := &handler.Search{Bot: bot, ChatID: config.ChatID}
 	handlers := []handler.Handler{twitterHandler, tapetaHandler, searchHandler}
 
+	log.Println("Ready to handle messages")
 	for update := range updates {
 		for _, h := range handlers {
 			h.Handle(update)

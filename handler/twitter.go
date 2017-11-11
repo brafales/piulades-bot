@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"log"
+
 	"github.com/brafales/piulades-bot/message"
 	"github.com/brafales/piulades-bot/twitter"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
@@ -13,8 +15,10 @@ type Twitter struct {
 }
 
 func (t *Twitter) Handle(update tgbotapi.Update) error {
+	log.Println("Handling with Twitter")
 	statusID, err := twitter.GetStatusID(update.Message.Text)
 	if err != nil {
+		log.Println("No twitter link found")
 		return err
 	}
 

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log"
 	"regexp"
 
 	"github.com/brafales/piulades-bot/pinchito"
@@ -16,8 +17,10 @@ type Search struct {
 }
 
 func (s *Search) Handle(update tgbotapi.Update) error {
+	log.Println("Handling with Search")
 	term := s.match(update.Message.Text)
 	if term == "" {
+		log.Println("No Search command found")
 		return nil
 	}
 
