@@ -32,7 +32,7 @@ func main() {
 
 	for update := range updates {
 		for _, h := range handlers {
-			go h.Handle(update)
+			h.Handle(update)
 		}
 	}
 }
