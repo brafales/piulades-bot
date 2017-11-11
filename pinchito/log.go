@@ -1,5 +1,9 @@
 package pinchito
 
+import (
+	"fmt"
+)
+
 type Log struct {
 	Id           int
 	Text         string
@@ -17,6 +21,13 @@ type User struct {
 	Avatar []byte
 }
 
-func (l *Log) PrettyText() string {
-	return l.Text
+func (l *Log) TelegramText() string {
+	if l.Text == "" {
+		return "No s'ha trobat cap log amb la cerca proporcionada"
+	}
+	return fmt.Sprintf("%s\n\n%s\n\n%s", l.Titol, l.Text, l.dateAndAuthor())
+}
+
+func (l *Log) dateAndAuthor() string {
+	return fmt.Sprintf("Enviat el %s per %s", l.Dia, l.Autor)
 }
