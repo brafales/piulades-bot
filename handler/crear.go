@@ -21,6 +21,8 @@ const keybReplyDiscardLog string = "DiscardLog"
 const cmdStartLog string = "log"
 const cmdEndLog string = "end_log"
 
+const titlePending string = "#Pending Title#"
+
 
 func (t *Crear) Handle(update tgbotapi.Update) error {
 	log.Println("Handling with Crear")
@@ -51,12 +53,12 @@ func (t *Crear) Handle(update tgbotapi.Update) error {
 		return t.handleKeyboardReply(update)
 	}
 
-
-	logInProgress, err := t.userHasLogInprogress(update.Message)
-	if err != nil {
-		return err
+	if t.userHasLogWithPendingTitle(update.Message) {
+		return t.handleTitle(update.Message)
 	}
-	if logInProgress {
+
+
+	if t.userHasLogInprogress(update.Message) {
 		t.appendMessageToLog(update.Message)
 	} else {
 		tgMessage := tgbotapi.NewMessage(update.Message.Chat.ID, "To Start a new log, type /" + cmdStartLog + " and then forward the messages you want to add. Once finished, type /" + cmdEndLog)
@@ -70,26 +72,36 @@ func (t *Crear) matchStartLog(message *tgbotapi.Message) (bool, error) {
 	if message == nil {
 		return false, nil
 	}
-	return regexp.MatchString("^/" + cmdStartLog + "", message.Text)
-}
-
-func (t *Crear) startLogFromMessage(message *tgbotapi.Message) error {
-	log.Println("Starting a new Log for UserID ", message.From.ID)
-	//TODO Manage existing log situation
-
-	t.ActiveLogs[message.From.ID] = &pinchito.Log{}
-
-	tgMessage := tgbotapi.NewMessage(message.Chat.ID, "Ready to start creating a new Log.\nPlease forward the messages you want to add. Once finished, type /" + cmdEndLog)
-	t.Bot.Send(tgMessage)
-
-	return nil
+	return regexp.MatchString("^" + cmdStartLog + "", message.Command())
 }
 
 func (t *Crear) matchEndLog(message *tgbotapi.Message) (bool, error) {
 	if message == nil {
 		return false, nil
 	}
-	return regexp.MatchString("^/" + cmdEndLog + "", message.Text)
+	return regexp.MatchString("^" + cmdEndLog + "", message.Command())
+}
+
+func (t *Crear) matchInlineKeyboardReply(update tgbotapi.Update) (bool, error) {
+	return update.CallbackQuery != nil, nil
+}
+
+func (t *Crear) startLogFromMessage(message *tgbotapi.Message) error {
+	log.Println("Starting a new Log for UserID ", message.From.ID)
+
+	if t.userHasLogInprogress(message) {
+		delete(t.ActiveLogs, message.From.ID)
+
+		tgMessage := tgbotapi.NewMessage(message.Chat.ID, "You already had a log in progress. Too bad. It has been discarded")
+		t.Bot.Send(tgMessage)
+	}
+
+	t.ActiveLogs[message.From.ID] = &pinchito.Log{}
+
+	tgMessage := tgbotapi.NewMessage(message.Chat.ID, "Ready to start creating a new Log.\nForward the messages you want to add. Once finished, type /" + cmdEndLog)
+	t.Bot.Send(tgMessage)
+
+	return nil
 }
 
 func (t *Crear) endLogFromMessage(message *tgbotapi.Message) error {
@@ -99,25 +111,26 @@ func (t *Crear) endLogFromMessage(message *tgbotapi.Message) error {
 
 	pinLog := t.ActiveLogs[message.From.ID]
 	if pinLog == nil {
+		tgMessage := tgbotapi.NewMessage(message.Chat.ID, "I haven't found any active log. Ignoring you")
+		t.Bot.Send(tgMessage)
 		return nil
 	}
 
 	pinLog.Nota = 0
-	//TODO Fill ID, Autor, Dia, Hora
-	//TODO Ask for Titol, Protagonista
+	//TODO Fill ID, Autor
+	logTime := time.Now()
+	pinLog.Dia = logTime.Format("02/01/2006")
+	pinLog.Hora = logTime.Format("15:04")
 
-	//log.Println("I've created the following Log:")
-	//log.Println(pinLog.Text)
+	titol := message.CommandArguments()
+	if len(titol) > 0 {
+		pinLog.Titol = titol
+	} else {
+		pinLog.Titol = titlePending
+	}
+	//TODO Ask for Protagonista
 
-	tgMessage := tgbotapi.NewMessage(message.Chat.ID, "I've created the following Log:")
-	t.Bot.Send(tgMessage)
-	tgMessage = tgbotapi.NewMessage(message.Chat.ID, pinLog.Text)
-	//t.Bot.Send(tgMessage)
-
-	//tgMessage = tgbotapi.NewMessage(message.Chat.ID, "Would you like me to save it?")
-
-	inlineButtons := tgbotapi.NewInlineKeyboardRow(tgbotapi.NewInlineKeyboardButtonData("Save Log", keybReplySaveLog), tgbotapi.NewInlineKeyboardButtonData("Discard Log", keybReplyDiscardLog))
-	tgMessage.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(inlineButtons)
+	tgMessage := tgbotapi.NewMessage(message.Chat.ID, "Which title do you want the log to have?")
 	t.Bot.Send(tgMessage)
 
 	return nil
@@ -148,10 +161,6 @@ func (t *Crear) appendMessageToLog(message *tgbotapi.Message) error {
 	pinLog.Text += author + message.Text + "\n"
 
 	return nil
-}
-
-func (t *Crear) matchInlineKeyboardReply(update tgbotapi.Update) (bool, error) {
-	return update.CallbackQuery != nil, nil
 }
 
 func (t *Crear) handleKeyboardReply(update tgbotapi.Update) error {
@@ -187,6 +196,33 @@ func (t *Crear) discardLog(update tgbotapi.Update) error {
 
 	return nil
 }
-func (t *Crear) userHasLogInprogress(message *tgbotapi.Message) (bool, error) {
-	return t.ActiveLogs[message.From.ID] != nil, nil
+
+func (t *Crear) userHasLogInprogress(message *tgbotapi.Message) bool {
+	return t.ActiveLogs[message.From.ID] != nil
+}
+func (t *Crear) userHasLogWithPendingTitle(message *tgbotapi.Message) bool {
+	if message == nil {
+		return false
+	}
+
+	pinLog := t.ActiveLogs[message.From.ID]
+	if pinLog == nil {
+		return false
+	}
+
+	return pinLog.Titol == titlePending
+}
+func (t *Crear) handleTitle(message *tgbotapi.Message) error {
+	pinLog := t.ActiveLogs[message.From.ID]
+	pinLog.Titol = message.Text
+
+	tgMessage := tgbotapi.NewMessage(message.Chat.ID, "I've created the following Log (" + pinLog.Titol + "):")
+	t.Bot.Send(tgMessage)
+	tgMessage = tgbotapi.NewMessage(message.Chat.ID, pinLog.Text)
+
+	inlineButtons := tgbotapi.NewInlineKeyboardRow(tgbotapi.NewInlineKeyboardButtonData("Save Log", keybReplySaveLog), tgbotapi.NewInlineKeyboardButtonData("Discard Log", keybReplyDiscardLog))
+	tgMessage.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(inlineButtons)
+	t.Bot.Send(tgMessage)
+
+	return nil
 }
