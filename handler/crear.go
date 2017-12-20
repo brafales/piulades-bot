@@ -53,12 +53,13 @@ func (t *Crear) Handle(update tgbotapi.Update) error {
 		return t.handleKeyboardReply(update)
 	}
 
+
 	if t.userHasLogWithPendingTitle(update.Message) {
 		return t.handleTitle(update.Message)
 	}
 
 
-	if t.userHasLogInprogress(update.Message) {
+	if t.userHasLogInProgress(update.Message) {
 		t.appendMessageToLog(update.Message)
 	} else {
 		tgMessage := tgbotapi.NewMessage(update.Message.Chat.ID, "To Start a new log, type /" + cmdStartLog + " and then forward the messages you want to add. Once finished, type /" + cmdEndLog)
@@ -89,7 +90,7 @@ func (t *Crear) matchInlineKeyboardReply(update tgbotapi.Update) (bool, error) {
 func (t *Crear) startLogFromMessage(message *tgbotapi.Message) error {
 	log.Println("Starting a new Log for UserID ", message.From.ID)
 
-	if t.userHasLogInprogress(message) {
+	if t.userHasLogInProgress(message) {
 		delete(t.ActiveLogs, message.From.ID)
 
 		tgMessage := tgbotapi.NewMessage(message.Chat.ID, "You already had a log in progress. Too bad. It has been discarded")
@@ -122,16 +123,19 @@ func (t *Crear) endLogFromMessage(message *tgbotapi.Message) error {
 	pinLog.Dia = logTime.Format("02/01/2006")
 	pinLog.Hora = logTime.Format("15:04")
 
+	//TODO Ask for Protagonista
+
+	//You can provide the title as an optional argument in cmdEndLog
 	titol := message.CommandArguments()
 	if len(titol) > 0 {
 		pinLog.Titol = titol
+		t.sendLogSummary(message)
 	} else {
 		pinLog.Titol = titlePending
+		tgMessage := tgbotapi.NewMessage(message.Chat.ID, "Which title do you want the log to have?")
+		t.Bot.Send(tgMessage)
 	}
-	//TODO Ask for Protagonista
 
-	tgMessage := tgbotapi.NewMessage(message.Chat.ID, "Which title do you want the log to have?")
-	t.Bot.Send(tgMessage)
 
 	return nil
 }
@@ -197,7 +201,7 @@ func (t *Crear) discardLog(update tgbotapi.Update) error {
 	return nil
 }
 
-func (t *Crear) userHasLogInprogress(message *tgbotapi.Message) bool {
+func (t *Crear) userHasLogInProgress(message *tgbotapi.Message) bool {
 	return t.ActiveLogs[message.From.ID] != nil
 }
 func (t *Crear) userHasLogWithPendingTitle(message *tgbotapi.Message) bool {
@@ -215,6 +219,12 @@ func (t *Crear) userHasLogWithPendingTitle(message *tgbotapi.Message) bool {
 func (t *Crear) handleTitle(message *tgbotapi.Message) error {
 	pinLog := t.ActiveLogs[message.From.ID]
 	pinLog.Titol = message.Text
+
+	return t.sendLogSummary(message)
+}
+
+func (t *Crear) sendLogSummary(message *tgbotapi.Message) error {
+	pinLog := t.ActiveLogs[message.From.ID]
 
 	tgMessage := tgbotapi.NewMessage(message.Chat.ID, "I've created the following Log (" + pinLog.Titol + "):")
 	t.Bot.Send(tgMessage)
