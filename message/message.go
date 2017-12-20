@@ -34,3 +34,7 @@ func BuildLog(chatID int64, log pinchito.Log) tgbotapi.Chattable {
 	msg := tgbotapi.NewMessage(chatID, log.TelegramText())
 	return msg
 }
+
+func GetFWFromUsername(message *tgbotapi.Message) string {
+	return message.ForwardFrom.UserName
+}
