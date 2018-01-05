@@ -65,17 +65,6 @@ func UploadNewLog(uploadOp *JSONUploadOp) (int, error) {
 	return response.IdPlog, nil
 
 }
-/*
-func GetUserFromId(id int) (TgPinchitoUser, error) {
-	for _, user := range tgPinchitoUsers {
-		if user.Id == id {
-			return user, nil
-		}
-	}
-
-	return TgPinchitoUser{}, errors.New(fmt.Sprintf("No User found with id %d", id))
-}
-*/
 
 func GetUserFromNick(nick string) (TgPinchitoUser, error) {
 	for _, user := range tgPinchitoUsers {
