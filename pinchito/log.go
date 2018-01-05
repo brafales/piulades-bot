@@ -21,6 +21,26 @@ type User struct {
 	Avatar []byte
 }
 
+
+type JSONUploadOp struct {
+	AuthToken string
+	Upload PlogData
+}
+
+type PlogData struct {
+	Text         string
+	Protagonista int
+	Autor        int
+	Titol        string
+	Data         int64 // Unix epoch
+}
+
+type JSONUploadResult struct {
+	Result       bool
+	IdPlog       int
+	ErrorMessage string
+}
+
 func (l *Log) TelegramText() string {
 	if l.Text == "" {
 		return "No s'ha trobat cap log amb la cerca proporcionada"

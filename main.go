@@ -41,19 +41,26 @@ func main() {
 			}
 		}
 	*/
-	crearHandler := &handler.Crear{Bot: bot, ChatID: config.ChatID, ActiveLogs: map[int]*pinchito.Log{}}
+
+	pinchito.InitUsers()
+
+	crearHandler := &handler.Crear{
+		Bot: bot,
+		ChatID: config.ChatID,
+		ActiveLogs: map[int]*pinchito.PlogData{},
+		AuthToken:config.PinchitoAuthToken,
+	}
+
+
 	conf := tgbotapi.NewUpdate(0)
 	for {
-		//log.Println("Conf offset: ", conf.Offset)
 		updates, _ := bot.GetUpdates(conf)
 		if len(updates) > 0 {
 			for _, update := range updates {
-				//log.Println("UpdateID: ", update.UpdateID)
 				crearHandler.Handle(update)
 
 				if update.UpdateID >= conf.Offset {
 					conf.Offset = update.UpdateID + 1
-					//log.Println("Conf: ", conf)
 				}
 			}
 		}

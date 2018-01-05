@@ -4,11 +4,16 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/url"
+	"errors"
+	"bytes"
+	"os"
+	"strconv"
 )
 
 func Tapeta() (Log, error) {
+	host := os.Getenv("PINCHITO_HOST")
 	log := Log{}
-	res, err := http.Get("http://go.pinchito.com/json/random")
+	res, err := http.Get("http://" + host + "/json/random")
 	if err != nil {
 		return log, err
 	}
@@ -17,8 +22,9 @@ func Tapeta() (Log, error) {
 }
 
 func Search(term string) (Log, error) {
+	host := os.Getenv("PINCHITO_HOST")
 	logs := []Log{}
-	baseURL := "http://go.pinchito.com/json/search?"
+	baseURL := "http://" + host + "/json/search?"
 	params := url.Values{}
 	params.Add("s", term)
 
@@ -35,4 +41,63 @@ func Search(term string) (Log, error) {
 		return Log{}, nil
 	}
 	return logs[0], nil
+}
+
+func UploadNewLog(uploadOp *JSONUploadOp) (int, error) {
+	host := os.Getenv("PINCHITO_HOST")
+
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(uploadOp)
+	res, err := http.Post("http://" + host + "/json/upload", "application/json", b)
+	if err != nil {
+		return -1, err
+	}
+
+	response := JSONUploadResult{}
+	err = json.NewDecoder(res.Body).Decode(&response)
+	if err != nil {
+		return -1, err
+	}
+	if !response.Result {
+		return -1, errors.New("An error ocured while saving the log: " + response.ErrorMessage)
+	}
+
+	return response.IdPlog, nil
+
+}
+/*
+func GetUserFromId(id int) (TgPinchitoUser, error) {
+	for _, user := range tgPinchitoUsers {
+		if user.Id == id {
+			return user, nil
+		}
+	}
+
+	return TgPinchitoUser{}, errors.New(fmt.Sprintf("No User found with id %d", id))
+}
+*/
+
+func GetUserFromNick(nick string) (TgPinchitoUser, error) {
+	for _, user := range tgPinchitoUsers {
+		if user.Nick == nick {
+			return user, nil
+		}
+	}
+
+	return TgPinchitoUser{}, errors.New("No User found with login " + nick)
+}
+
+
+func GetUserFromTgId(tgId int) (TgPinchitoUser, error) {
+	for _, user := range tgPinchitoUsers {
+		if user.TgId == tgId {
+			return user, nil
+		}
+	}
+
+	return TgPinchitoUser{}, errors.New("No User found with Telegram ID " + strconv.Itoa(tgId))
+}
+
+func GetPinchitoUsers() []TgPinchitoUser {
+	return tgPinchitoUsers
 }

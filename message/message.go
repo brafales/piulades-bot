@@ -6,6 +6,7 @@ import (
 	"github.com/brafales/piulades-bot/pinchito"
 
 	"github.com/go-telegram-bot-api/telegram-bot-api"
+	"time"
 )
 
 //Build returns a list of Chattable objects to send via Telegram
@@ -37,4 +38,21 @@ func BuildLog(chatID int64, log pinchito.Log) tgbotapi.Chattable {
 
 func GetFWFromUsername(message *tgbotapi.Message) string {
 	return message.ForwardFrom.UserName
+}
+
+func BuildNewLogLine(message *tgbotapi.Message) string {
+
+	var author string
+	if message.ForwardFrom != nil {
+		author = "[" + time.Unix(int64(message.ForwardDate), 0).Format("15:04:05") + "] "
+		if len(message.ForwardFrom.UserName) > 0 {
+			author += "<" + message.ForwardFrom.UserName + "> "
+		} else {
+			author += "<" + message.ForwardFrom.FirstName + " " + message.ForwardFrom.LastName + "> "
+		}
+	} else {
+		author = "[" + time.Unix(int64(message.Date), 0).Format("15:04:05") + "] < ??? > "
+	}
+
+	return author + message.Text + "\n"
 }
