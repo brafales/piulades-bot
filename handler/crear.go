@@ -149,6 +149,12 @@ func (t *Crear) reset(message *tgbotapi.Message) (bool, error) {
 
 func (t *Crear) startLogFromMessage(message *tgbotapi.Message) error {
 	log.Println("Starting a new Log for UserID ", message.From.ID)
+	autor, err := pinchito.GetUserFromTelegramUsername(message.From.UserName)
+	if err != nil {
+		t.sendMsg(message.Chat.ID, "Who are you? You don't seem to be a TruePinchito™. Talk with someone who can fix this")
+		t.reset(message)
+		return err
+	}
 
 	if t.userHasLogInProgress(message) {
 		delete(t.ActiveLogs, message.From.ID)
@@ -156,7 +162,9 @@ func (t *Crear) startLogFromMessage(message *tgbotapi.Message) error {
 		t.sendMsg(message.Chat.ID, "You already had a log in progress. Too bad. It has been discarded")
 	}
 
-	t.ActiveLogs[message.From.ID] = &pinchito.PlogData{}
+	pinLog := pinchito.PlogData{}
+	pinLog.Autor = autor.PinId
+	t.ActiveLogs[message.From.ID] = &pinLog
 
 	t.sendMsg(message.Chat.ID, "Ready to start creating a new Log.\nForward the messages you want to add. Once finished, type /" + cmdEndLog)
 
@@ -176,12 +184,6 @@ func (t *Crear) endLogFromMessage(message *tgbotapi.Message) error {
 		t.sendMsg(message.Chat.ID, "Why do you want to create an empty log? Try harder")
 		return nil
 	}
-
-	autor, err := pinchito.GetUserFromTelegramUsername(message.From.UserName)
-	if err != nil {
-		return err
-	}
-	pinLog.Autor = autor.PinId
 	pinLog.Data = time.Now().Unix()
 	pinLog.Protagonista = protagonistIdPending
 
