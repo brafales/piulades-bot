@@ -70,7 +70,7 @@ func (c *Crear) Handle(update tgbotapi.Update) error {
 	// We are also allowing "//"
 	if update.Message != nil && update.Message.IsCommand() && update.Message.Command() != "/" {
 		log.Print("Unknown CMD:" + update.Message.Command())
-		c.sendMsg(update.Message.Chat.ID, "I don'c know what you mean with '/"+update.Message.Command()+"' Check the list of commands by typing '/' and disable your keyboard's auto-correct system")
+		c.sendMsg(update.Message.Chat.ID, "I don't know what you mean with '/"+update.Message.Command()+"' Check the list of commands by typing '/' and disable your keyboard's auto-correct system")
 		return nil
 	}
 
@@ -95,7 +95,7 @@ func (c *Crear) Handle(update tgbotapi.Update) error {
 		return c.appendMessageToLog(update.Message)
 	}
 
-	//We shouldn'c get here. Don'c know what to do, send instructions
+	//We shouldn't get here. Don't know what to do, send instructions
 	tgMessage := tgbotapi.NewMessage(update.Message.Chat.ID, "To Start a new log, type /"+cmdNewLog+" and then forward the messages you want to add. Once finished, type /"+cmdEndLog)
 	c.Bot.Send(tgMessage)
 
@@ -137,7 +137,7 @@ func (c *Crear) startLogFromMessage(message *tgbotapi.Message) error {
 	log.Println("Starting a new Log for UserID ", message.From.ID)
 	autor, err := c.PinchitoClient.GetUserFromTelegramUsername(message.From.UserName)
 	if err != nil {
-		c.sendMsg(message.Chat.ID, "Who are you? You don'c seem to be a TruePinchito™. Talk with someone who can fix this")
+		c.sendMsg(message.Chat.ID, "Who are you? You don't seem to be a TruePinchito™. Talk with someone who can fix this")
 		c.reset(message)
 		return err
 	}
@@ -162,7 +162,7 @@ func (c *Crear) endLogFromMessage(message *tgbotapi.Message) error {
 
 	pinLog := c.ActiveLogs[message.From.ID]
 	if pinLog == nil {
-		c.sendMsg(message.Chat.ID, "I haven'c found any active log. Ignoring you")
+		c.sendMsg(message.Chat.ID, "I haven't found any active log. Ignoring you")
 		return nil
 	}
 
