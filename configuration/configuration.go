@@ -15,6 +15,7 @@ type Configuration struct {
 	BotKey            string
 	CallbackURL       string
 	PinchitoAuthToken string
+	PinchitoHost      string
 }
 
 //New returns a new Config
@@ -30,6 +31,7 @@ func New() (*Configuration, error) {
 		BotKey:            os.Getenv("BOT_KEY"),
 		CallbackURL:       os.Getenv("CALLBACK_URL"),
 		PinchitoAuthToken: os.Getenv("PINCHITO_AUTH_TOKEN"),
+		PinchitoHost:      os.Getenv("PINCHITO_HOST"),
 		ChatID:            chatID,
 	}, nil
 }

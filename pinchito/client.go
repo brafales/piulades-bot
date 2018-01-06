@@ -6,13 +6,16 @@ import (
 	"errors"
 	"net/http"
 	"net/url"
-	"os"
+	"strconv"
 )
 
-func Tapeta() (Log, error) {
-	host := os.Getenv("PINCHITO_HOST")
+type Client struct {
+	PinchitoHost string
+}
+
+func (c *Client) Tapeta() (Log, error) {
 	log := Log{}
-	res, err := http.Get("http://" + host + "/json/random")
+	res, err := http.Get("http://" + c.PinchitoHost + "/json/random")
 	if err != nil {
 		return log, err
 	}
@@ -20,10 +23,9 @@ func Tapeta() (Log, error) {
 	return log, err
 }
 
-func Search(term string) (Log, error) {
-	host := os.Getenv("PINCHITO_HOST")
+func (c *Client) Search(term string) (Log, error) {
 	logs := []Log{}
-	baseURL := "http://" + host + "/json/search?"
+	baseURL := "http://" + c.PinchitoHost + "/json/search?"
 	params := url.Values{}
 	params.Add("s", term)
 
@@ -42,30 +44,28 @@ func Search(term string) (Log, error) {
 	return logs[0], nil
 }
 
-func UploadNewLog(uploadOp *JSONUploadOp) (int, error) {
-	host := os.Getenv("PINCHITO_HOST")
-
+func (c *Client) UploadNewLog(uploadOp *JSONUploadOp) (string, error) {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(uploadOp)
-	res, err := http.Post("http://"+host+"/json/upload", "application/json", b)
+	res, err := http.Post("http://"+c.PinchitoHost+"/json/upload", "application/json", b)
 	if err != nil {
-		return -1, err
+		return "", err
 	}
 
 	response := JSONUploadResult{}
 	err = json.NewDecoder(res.Body).Decode(&response)
 	if err != nil {
-		return -1, err
+		return "", err
 	}
 	if !response.Result {
-		return -1, errors.New("An error ocured while saving the log: " + response.ErrorMessage)
+		return "", errors.New("An error ocured while saving the log: " + response.ErrorMessage)
 	}
 
-	return response.IdPlog, nil
+	return "http://" + c.PinchitoHost + "/" + strconv.Itoa(response.IdPlog), nil
 
 }
 
-func GetUserFromPinchitoNick(nick string) (TgPinchitoUser, error) {
+func (c *Client) GetUserFromPinchitoNick(nick string) (TgPinchitoUser, error) {
 	for _, user := range tgPinchitoUsers {
 		if user.PinNick == nick {
 			return user, nil
@@ -75,7 +75,7 @@ func GetUserFromPinchitoNick(nick string) (TgPinchitoUser, error) {
 	return TgPinchitoUser{}, errors.New("No User found with login " + nick)
 }
 
-func GetUserFromTelegramUsername(tgUsername string) (TgPinchitoUser, error) {
+func (c *Client) GetUserFromTelegramUsername(tgUsername string) (TgPinchitoUser, error) {
 	for _, user := range tgPinchitoUsers {
 		if user.TgUsername == tgUsername {
 			return user, nil
@@ -85,6 +85,6 @@ func GetUserFromTelegramUsername(tgUsername string) (TgPinchitoUser, error) {
 	return TgPinchitoUser{}, errors.New("No User found with Telegram username " + tgUsername)
 }
 
-func GetPinchitoUsers() []TgPinchitoUser {
+func (c *Client) GetPinchitoUsers() []TgPinchitoUser {
 	return tgPinchitoUsers
 }

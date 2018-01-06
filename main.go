@@ -44,11 +44,16 @@ func main() {
 
 	pinchito.InitUsers()
 
+	pinchitoClient := pinchito.Client{
+		PinchitoHost: config.PinchitoHost,
+	}
+
 	crearHandler := &handler.Crear{
-		Bot:        bot,
-		ChatID:     config.ChatID,
-		ActiveLogs: map[int]*pinchito.PlogData{},
-		AuthToken:  config.PinchitoAuthToken,
+		Bot:            bot,
+		ChatID:         config.ChatID,
+		ActiveLogs:     map[int]*pinchito.PlogData{},
+		AuthToken:      config.PinchitoAuthToken,
+		PinchitoClient: pinchitoClient,
 	}
 
 	conf := tgbotapi.NewUpdate(0)

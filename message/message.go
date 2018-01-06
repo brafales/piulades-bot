@@ -40,21 +40,17 @@ func GetFWFromUsername(message *tgbotapi.Message) string {
 	return message.ForwardFrom.UserName
 }
 
-func BuildNewLogLine(message *tgbotapi.Message) string {
-	var author string
-	if message.ForwardFrom != nil {
-		user, err := pinchito.GetUserFromTelegramUsername(message.ForwardFrom.UserName)
-		author = "[" + time.Unix(int64(message.ForwardDate), 0).Format("15:04:05") + "] "
-		if err == nil {
-			author += "<" + user.PinNick + "> "
-		} else if len(message.ForwardFrom.UserName) > 0 {
-			author += "<" + message.ForwardFrom.UserName + "> "
-		} else {
-			author += "<" + message.ForwardFrom.FirstName + " " + message.ForwardFrom.LastName + "> "
-		}
+func BuildNewLogLine(nick string, message *tgbotapi.Message) string {
+
+	line := "[" + time.Unix(int64(message.ForwardDate), 0).Format("15:04:05") + "] "
+
+	if len(nick) > 0 {
+		line += "<" + nick + "> "
 	} else {
-		author = "[" + time.Unix(int64(message.Date), 0).Format("15:04:05") + "] < ??? > "
+		line += "< ??? >"
 	}
 
-	return author + message.Text + "\n"
+	line += message.Text + "\n"
+
+	return line
 }
