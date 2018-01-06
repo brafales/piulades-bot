@@ -47,7 +47,7 @@ func BuildNewLogLine(message *tgbotapi.Message) string {
 		author = "[" + time.Unix(int64(message.ForwardDate), 0).Format("15:04:05") + "] "
 		if err == nil {
 			author += "<" + user.PinNick + "> "
-		}else if len(message.ForwardFrom.UserName) > 0 {
+		} else if len(message.ForwardFrom.UserName) > 0 {
 			author += "<" + message.ForwardFrom.UserName + "> "
 		} else {
 			author += "<" + message.ForwardFrom.FirstName + " " + message.ForwardFrom.LastName + "> "

@@ -1,12 +1,12 @@
 package handler
 
 import (
-	"log"
-	"regexp"
-	"time"
-	"strconv"
 	"fmt"
 	pinmessage "github.com/brafales/piulades-bot/message"
+	"log"
+	"regexp"
+	"strconv"
+	"time"
 
 	"github.com/brafales/piulades-bot/pinchito"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
@@ -31,7 +31,6 @@ const cmdCancel string = "cancel"
 const titlePending string = "#Pending Title#"
 const protagonistIdPending int = -1
 
-
 func (t *Crear) Handle(update tgbotapi.Update) error {
 	log.Println("Handling with Crear")
 
@@ -51,7 +50,6 @@ func (t *Crear) Handle(update tgbotapi.Update) error {
 		return t.startLogFromMessage(update.Message)
 	}
 
-
 	match, err = t.matchCommand(cmdEndLog, update.Message)
 	if err != nil {
 		return err
@@ -60,27 +58,22 @@ func (t *Crear) Handle(update tgbotapi.Update) error {
 		return t.endLogFromMessage(update.Message)
 	}
 
-
 	match, err = t.matchCommand(cmdCancel, update.Message)
 	if err != nil {
 		return err
 	}
 	if match {
-		_,err := t.reset(update.Message)
+		_, err := t.reset(update.Message)
 		return err
 	}
 
 	// If it's a CMD and it's not one of ours, this message is not for us
 	// We are also allowing "//"
-	if update.Message != nil && update.Message.IsCommand() && update.Message.Command() != "/"{
+	if update.Message != nil && update.Message.IsCommand() && update.Message.Command() != "/" {
 		log.Print("Unknown CMD:" + update.Message.Command())
-		t.sendMsg(update.Message.Chat.ID, "I don't know what you mean with '/" + update.Message.Command() + "' Check the list of commands by typing '/' and disable your keyboard's auto-correct system")
+		t.sendMsg(update.Message.Chat.ID, "I don't know what you mean with '/"+update.Message.Command()+"' Check the list of commands by typing '/' and disable your keyboard's auto-correct system")
 		return nil
 	}
-
-
-
-
 
 	isReply, err := t.hasInlineKeyboardReply(update)
 	if err != nil {
@@ -90,37 +83,32 @@ func (t *Crear) Handle(update tgbotapi.Update) error {
 		return t.handleKeyboardReply(update)
 	}
 
-
 	if t.userHasLogWithPendingTitle(update.Message) {
 		return t.handleTitle(update.Message)
 	}
 
-
 	if t.userHasLogWithPendingProtagonist(update.Message) {
 		return t.handleProtagonist(update.Message)
 	}
-
 
 	//This should be the last option; everything not handled before will be appended to the Log
 	if t.userHasLogInProgress(update.Message) {
 		return t.appendMessageToLog(update.Message)
 	}
 
-
 	//We shouldn't get here. Don't know what to do, send instructions
-	tgMessage := tgbotapi.NewMessage(update.Message.Chat.ID, "To Start a new log, type /" +cmdNewLog+ " and then forward the messages you want to add. Once finished, type /" + cmdEndLog)
+	tgMessage := tgbotapi.NewMessage(update.Message.Chat.ID, "To Start a new log, type /"+cmdNewLog+" and then forward the messages you want to add. Once finished, type /"+cmdEndLog)
 	t.Bot.Send(tgMessage)
 
 	return nil
 }
 
-
 func (t *Crear) welcomeUser(message *tgbotapi.Message) error {
-	msg := tgbotapi.NewMessage(message.Chat.ID, "Hello "+ message.From.FirstName + " " + message.From.LastName + "!")
+	msg := tgbotapi.NewMessage(message.Chat.ID, "Hello "+message.From.FirstName+" "+message.From.LastName+"!")
 	msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(false)
 	t.Bot.Send(msg)
 
-	t.sendMsg(message.Chat.ID, "To Start a new log, type /" +cmdNewLog+ " and then forward the messages you want to add. Once finished, type /" + cmdEndLog)
+	t.sendMsg(message.Chat.ID, "To Start a new log, type /"+cmdNewLog+" and then forward the messages you want to add. Once finished, type /"+cmdEndLog)
 
 	return nil
 }
@@ -129,7 +117,7 @@ func (t *Crear) matchCommand(command string, message *tgbotapi.Message) (bool, e
 	if message == nil {
 		return false, nil
 	}
-	return regexp.MatchString("^" + command + "", message.Command())
+	return regexp.MatchString("^"+command+"", message.Command())
 }
 
 func (t *Crear) hasInlineKeyboardReply(update tgbotapi.Update) (bool, error) {
@@ -145,7 +133,6 @@ func (t *Crear) reset(message *tgbotapi.Message) (bool, error) {
 
 	return true, nil
 }
-
 
 func (t *Crear) startLogFromMessage(message *tgbotapi.Message) error {
 	log.Println("Starting a new Log for UserID ", message.From.ID)
@@ -166,7 +153,7 @@ func (t *Crear) startLogFromMessage(message *tgbotapi.Message) error {
 	pinLog.Autor = autor.PinId
 	t.ActiveLogs[message.From.ID] = &pinLog
 
-	t.sendMsg(message.Chat.ID, "Ready to start creating a new Log.\nForward the messages you want to add. Once finished, type /" + cmdEndLog)
+	t.sendMsg(message.Chat.ID, "Ready to start creating a new Log.\nForward the messages you want to add. Once finished, type /"+cmdEndLog)
 
 	return nil
 }
@@ -242,7 +229,7 @@ func (t *Crear) saveLog(userId int) (int, error) {
 
 	pinLog := t.ActiveLogs[userId]
 
-	uploadOp := &pinchito.JSONUploadOp{AuthToken:t.AuthToken, Upload:*pinLog}
+	uploadOp := &pinchito.JSONUploadOp{AuthToken: t.AuthToken, Upload: *pinLog}
 	logId, err := pinchito.UploadNewLog(uploadOp)
 
 	return logId, err
@@ -321,9 +308,9 @@ func (t *Crear) askForProtagonist(message *tgbotapi.Message) error {
 
 func (t *Crear) handleProtagonist(message *tgbotapi.Message) error {
 
-	user,err := pinchito.GetUserFromPinchitoNick(message.Text)
+	user, err := pinchito.GetUserFromPinchitoNick(message.Text)
 	if err != nil {
-		t.sendMsg(message.Chat.ID, "'" + message.Text + "' is not a TruePinchito™. Try again")
+		t.sendMsg(message.Chat.ID, "'"+message.Text+"' is not a TruePinchito™. Try again")
 		return err
 	}
 
@@ -331,7 +318,7 @@ func (t *Crear) handleProtagonist(message *tgbotapi.Message) error {
 
 	pinLog.Protagonista = user.PinId
 
-	tgMessage := tgbotapi.NewMessage(message.Chat.ID, "Using '" + user.PinNick + "' as your protagonist.")
+	tgMessage := tgbotapi.NewMessage(message.Chat.ID, "Using '"+user.PinNick+"' as your protagonist.")
 	tgMessage.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
 	t.Bot.Send(tgMessage)
 
@@ -340,15 +327,15 @@ func (t *Crear) handleProtagonist(message *tgbotapi.Message) error {
 
 func (t *Crear) sendLogSummary(message *tgbotapi.Message) error {
 	pinLog := t.ActiveLogs[message.From.ID]
-	user,err := pinchito.GetUserFromPinchitoNick(message.Text)
+	user, err := pinchito.GetUserFromPinchitoNick(message.Text)
 	if err != nil {
-		t.sendMsg(message.Chat.ID, "'" + message.Text + "' is not a TruePinchito™. Try again")
+		t.sendMsg(message.Chat.ID, "'"+message.Text+"' is not a TruePinchito™. Try again")
 		return err
 	}
 
 	t.sendMsg(message.Chat.ID, "I've created the following Log:")
 
-	tgMessage := tgbotapi.NewMessage(message.Chat.ID, pinLog.Titol + " (featuring " + user.PinNick + ")\n\n" + pinLog.Text)
+	tgMessage := tgbotapi.NewMessage(message.Chat.ID, pinLog.Titol+" (featuring "+user.PinNick+")\n\n"+pinLog.Text)
 	inlineButtons := tgbotapi.NewInlineKeyboardRow(
 		tgbotapi.NewInlineKeyboardButtonData("Save Log", keybReplySaveLog),
 		tgbotapi.NewInlineKeyboardButtonData("Discard Log", keybReplyDiscardLog))

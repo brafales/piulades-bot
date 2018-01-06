@@ -1,11 +1,11 @@
 package pinchito
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/url"
-	"errors"
-	"bytes"
 	"os"
 )
 
@@ -47,7 +47,7 @@ func UploadNewLog(uploadOp *JSONUploadOp) (int, error) {
 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(uploadOp)
-	res, err := http.Post("http://" + host + "/json/upload", "application/json", b)
+	res, err := http.Post("http://"+host+"/json/upload", "application/json", b)
 	if err != nil {
 		return -1, err
 	}
@@ -74,7 +74,6 @@ func GetUserFromPinchitoNick(nick string) (TgPinchitoUser, error) {
 
 	return TgPinchitoUser{}, errors.New("No User found with login " + nick)
 }
-
 
 func GetUserFromTelegramUsername(tgUsername string) (TgPinchitoUser, error) {
 	for _, user := range tgPinchitoUsers {

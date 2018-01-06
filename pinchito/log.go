@@ -21,10 +21,9 @@ type User struct {
 	Avatar []byte
 }
 
-
 type JSONUploadOp struct {
 	AuthToken string
-	Upload PlogData
+	Upload    PlogData
 }
 
 type PlogData struct {

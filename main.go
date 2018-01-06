@@ -45,12 +45,11 @@ func main() {
 	pinchito.InitUsers()
 
 	crearHandler := &handler.Crear{
-		Bot: bot,
-		ChatID: config.ChatID,
+		Bot:        bot,
+		ChatID:     config.ChatID,
 		ActiveLogs: map[int]*pinchito.PlogData{},
-		AuthToken:config.PinchitoAuthToken,
+		AuthToken:  config.PinchitoAuthToken,
 	}
-
 
 	conf := tgbotapi.NewUpdate(0)
 	for {
