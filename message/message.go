@@ -42,15 +42,30 @@ func GetFWFromUsername(message *tgbotapi.Message) string {
 
 func BuildNewLogLine(nick string, message *tgbotapi.Message) string {
 
+	// TODO Properly handle other types of messages
+	// (Audio, img, ...)
+
 	line := "[" + time.Unix(int64(message.ForwardDate), 0).Format("15:04:05") + "] "
 
 	if len(nick) > 0 {
 		line += "<" + nick + "> "
 	} else {
-		line += "< ??? >"
+		line += "< ??? > "
 	}
 
-	line += message.Text + "\n"
+	line += message.Text
 
-	return line
+	if message.Photo != nil {
+		line += "[imatge]"
+	} else if message.Audio != nil {
+		line += "[àudio]"
+	} else if message.Document != nil {
+		line += "[fitxer]"
+	} else if message.Contact != nil {
+		line += "[contacte]"
+	} else if message.Location != nil {
+		line += "[localització]"
+	}
+
+	return line + "\n"
 }

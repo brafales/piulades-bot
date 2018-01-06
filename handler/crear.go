@@ -189,12 +189,7 @@ func (c *Crear) appendMessageToLog(message *tgbotapi.Message) error {
 	}
 
 	nick := c.GetNickFromMessage(message)
-	line := pinmessage.BuildNewLogLine(nick, message)
-	if len(line) > 0 {
-		pinLog.Text += line
-	}
-	// TODO Handle other types of messages
-	// (Audio, img, ...)
+	pinLog.Text += pinmessage.BuildNewLogLine(nick, message)
 
 	return nil
 }
