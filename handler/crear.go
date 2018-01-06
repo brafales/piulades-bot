@@ -120,8 +120,6 @@ func (t *Crear) welcomeUser(message *tgbotapi.Message) error {
 	msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(false)
 	t.Bot.Send(msg)
 
-	t.sendMsg(message.Chat.ID, "Your Telegram User ID is " + strconv.Itoa(message.From.ID))
-
 	t.sendMsg(message.Chat.ID, "To Start a new log, type /" +cmdNewLog+ " and then forward the messages you want to add. Once finished, type /" + cmdEndLog)
 
 	return nil
