@@ -7,7 +7,6 @@ import (
 	"errors"
 	"bytes"
 	"os"
-	"strconv"
 )
 
 func Tapeta() (Log, error) {
@@ -66,9 +65,9 @@ func UploadNewLog(uploadOp *JSONUploadOp) (int, error) {
 
 }
 
-func GetUserFromNick(nick string) (TgPinchitoUser, error) {
+func GetUserFromPinchitoNick(nick string) (TgPinchitoUser, error) {
 	for _, user := range tgPinchitoUsers {
-		if user.Nick == nick {
+		if user.PinNick == nick {
 			return user, nil
 		}
 	}
@@ -77,14 +76,14 @@ func GetUserFromNick(nick string) (TgPinchitoUser, error) {
 }
 
 
-func GetUserFromTgId(tgId int) (TgPinchitoUser, error) {
+func GetUserFromTelegramUsername(tgUsername string) (TgPinchitoUser, error) {
 	for _, user := range tgPinchitoUsers {
-		if user.TgId == tgId {
+		if user.TgUsername == tgUsername {
 			return user, nil
 		}
 	}
 
-	return TgPinchitoUser{}, errors.New("No User found with Telegram ID " + strconv.Itoa(tgId))
+	return TgPinchitoUser{}, errors.New("No User found with Telegram username " + tgUsername)
 }
 
 func GetPinchitoUsers() []TgPinchitoUser {

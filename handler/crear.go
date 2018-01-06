@@ -179,7 +179,7 @@ func (t *Crear) endLogFromMessage(message *tgbotapi.Message) error {
 		return nil
 	}
 
-	autor, err := pinchito.GetUserFromTgId(message.From.ID)
+	autor, err := pinchito.GetUserFromTelegramUsername(message.From.UserName)
 	if err != nil {
 		return err
 	}
@@ -307,7 +307,7 @@ func (t *Crear) askForProtagonist(message *tgbotapi.Message) error {
 	users := pinchito.GetPinchitoUsers()
 	var buttons [][]tgbotapi.KeyboardButton
 	for _, user := range users {
-		buttons = append(buttons, tgbotapi.NewKeyboardButtonRow(tgbotapi.NewKeyboardButton(user.Nick)))
+		buttons = append(buttons, tgbotapi.NewKeyboardButtonRow(tgbotapi.NewKeyboardButton(user.PinNick)))
 	}
 
 	kbMarkup := tgbotapi.NewReplyKeyboard(buttons...)
@@ -321,7 +321,7 @@ func (t *Crear) askForProtagonist(message *tgbotapi.Message) error {
 
 func (t *Crear) handleProtagonist(message *tgbotapi.Message) error {
 
-	user,err := pinchito.GetUserFromNick(message.Text)
+	user,err := pinchito.GetUserFromPinchitoNick(message.Text)
 	if err != nil {
 		t.sendMsg(message.Chat.ID, "'" + message.Text + "' is not a TruePinchito™. Try again")
 		return err
@@ -331,7 +331,7 @@ func (t *Crear) handleProtagonist(message *tgbotapi.Message) error {
 
 	pinLog.Protagonista = user.PinId
 
-	tgMessage := tgbotapi.NewMessage(message.Chat.ID, "Using '" + user.Nick + "' as your protagonist.")
+	tgMessage := tgbotapi.NewMessage(message.Chat.ID, "Using '" + user.PinNick + "' as your protagonist.")
 	tgMessage.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
 	t.Bot.Send(tgMessage)
 
@@ -340,7 +340,7 @@ func (t *Crear) handleProtagonist(message *tgbotapi.Message) error {
 
 func (t *Crear) sendLogSummary(message *tgbotapi.Message) error {
 	pinLog := t.ActiveLogs[message.From.ID]
-	user,err := pinchito.GetUserFromNick(message.Text)
+	user,err := pinchito.GetUserFromPinchitoNick(message.Text)
 	if err != nil {
 		t.sendMsg(message.Chat.ID, "'" + message.Text + "' is not a TruePinchito™. Try again")
 		return err
@@ -348,7 +348,7 @@ func (t *Crear) sendLogSummary(message *tgbotapi.Message) error {
 
 	t.sendMsg(message.Chat.ID, "I've created the following Log:")
 
-	tgMessage := tgbotapi.NewMessage(message.Chat.ID, pinLog.Titol + " (featuring " + user.Nick + ")\n\n" + pinLog.Text)
+	tgMessage := tgbotapi.NewMessage(message.Chat.ID, pinLog.Titol + " (featuring " + user.PinNick + ")\n\n" + pinLog.Text)
 	inlineButtons := tgbotapi.NewInlineKeyboardRow(
 		tgbotapi.NewInlineKeyboardButtonData("Save Log", keybReplySaveLog),
 		tgbotapi.NewInlineKeyboardButtonData("Discard Log", keybReplyDiscardLog))
