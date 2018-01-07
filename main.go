@@ -28,7 +28,6 @@ func main() {
 	twitterHandler := &handler.Twitter{Bot: bot, ChatID: config.ChatID, TwitterClient: twitterClient}
 	tapetaHandler := &handler.Tapeta{Bot: bot, ChatID: config.ChatID}
 	searchHandler := &handler.Search{Bot: bot, ChatID: config.ChatID}
-	pinchito.InitUsers()
 
 	pinchitoClient := pinchito.Client{
 		PinchitoHost: config.PinchitoHost,

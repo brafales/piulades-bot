@@ -8,7 +8,7 @@ type TgPinchitoUser struct {
 
 var tgPinchitoUsers []TgPinchitoUser
 
-func InitUsers() {
+func init() {
 	tgPinchitoUsers = []TgPinchitoUser{
 
 		TgPinchitoUser{"PaRaP", 1, "PaRaP"},
