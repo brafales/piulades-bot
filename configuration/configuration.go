@@ -8,14 +8,12 @@ import (
 
 //Configuration holds application configuration
 type Configuration struct {
-	TwitterAPIKey     string
-	TwitterAPISecret  string
-	ChatID            int64
-	Port              string
-	BotKey            string
-	CallbackURL       string
-	PinchitoAuthToken string
-	PinchitoHost      string
+	TwitterAPIKey    string
+	TwitterAPISecret string
+	ChatID           int64
+	Port             string
+	BotKey           string
+	CallbackURL      string
 }
 
 //New returns a new Config
@@ -25,13 +23,11 @@ func New() (*Configuration, error) {
 		return &Configuration{}, errors.New("Could not get chat id from environment")
 	}
 	return &Configuration{
-		TwitterAPIKey:     os.Getenv("TWITTER_API_KEY"),
-		TwitterAPISecret:  os.Getenv("TWITTER_API_SECRET"),
-		Port:              os.Getenv("PORT"),
-		BotKey:            os.Getenv("BOT_KEY"),
-		CallbackURL:       os.Getenv("CALLBACK_URL"),
-		PinchitoAuthToken: os.Getenv("PINCHITO_AUTH_TOKEN"),
-		PinchitoHost:      os.Getenv("PINCHITO_HOST"),
-		ChatID:            chatID,
+		TwitterAPIKey:    os.Getenv("TWITTER_API_KEY"),
+		TwitterAPISecret: os.Getenv("TWITTER_API_SECRET"),
+		Port:             os.Getenv("PORT"),
+		BotKey:           os.Getenv("BOT_KEY"),
+		CallbackURL:      os.Getenv("CALLBACK_URL"),
+		ChatID:           chatID,
 	}, nil
 }
