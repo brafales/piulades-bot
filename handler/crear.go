@@ -33,6 +33,12 @@ const protagonistIdPending int = -1
 func (c *Crear) Handle(update tgbotapi.Update) error {
 	log.Println("Handling with Crear")
 
+	private, err := c.isPrivateMessage(update.Message)
+	if err != nil || !private {
+		//We are only dealing with private messages
+		return err
+	}
+
 	match, err := c.matchCommand(cmdStart, update.Message)
 	if err != nil {
 		return err
@@ -42,7 +48,8 @@ func (c *Crear) Handle(update tgbotapi.Update) error {
 	}
 
 	match, err = c.matchCommand(cmdNewLog, update.Message)
-	if err != nil {
+	if err != nil || (!match && !c.userHasLogInProgress(update.Message)) {
+		//if we receive a message, it's not to start a new log and we have no log in progress, ignore it too
 		return err
 	}
 	if match {
@@ -358,4 +365,7 @@ func (c *Crear) GetNickFromMessage(message *tgbotapi.Message) string {
 	}
 
 	return nick
+}
+func (c *Crear) isPrivateMessage(message *tgbotapi.Message) (bool, error) {
+	return message.Chat.IsPrivate(), nil
 }
