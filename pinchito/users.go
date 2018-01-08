@@ -22,6 +22,7 @@ func init() {
 		{"mixtura", 8, "mixtura"},
 		{"santiee", 13, "Santiee"},
 		{"hydex86", 5, "HyDe"},
+		{"n0seres", 41, "n0seres"},
 		{"", 3, "CHeRNoBiL"},
 		{"", 6, "KoLiFLoR"},
 		{"", 7, "Sharek"},
