@@ -46,8 +46,10 @@ func main() {
 	log.Println("Ready to handle messages")
 	for update := range updates {
 		for _, h := range handlers {
-			log.Println("handling")
-			h.Handle(update)
+			err = h.Handle(update)
+			if err != nil {
+				log.Printf("Error handling message: %v\n", err)
+			}
 		}
 	}
 }

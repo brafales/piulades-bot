@@ -28,11 +28,12 @@ func (t *Tapeta) Handle(update tgbotapi.Update) error {
 		return nil
 	}
 
-	log, err := t.PinchitoClient.Tapeta()
+	log.Println("Tapeta command found")
+	tapeta, err := t.PinchitoClient.Tapeta()
 	if err != nil {
 		return err
 	}
-	telegramMessage := message.BuildLog(t.ChatID, log)
+	telegramMessage := message.BuildLog(t.ChatID, tapeta)
 	t.Bot.Send(telegramMessage)
 
 	return nil
