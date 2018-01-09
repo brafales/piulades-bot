@@ -4,16 +4,16 @@ import (
 	"log"
 	"regexp"
 
+	"github.com/brafales/piulades-bot/pinchito"
+
 	"github.com/brafales/piulades-bot/message"
 
-	"github.com/brafales/piulades-bot/pinchito"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 type Tapeta struct {
-	ChatID         int64
-	Bot            *tgbotapi.BotAPI
-	PinchitoClient pinchito.Client
+	ChatID int64
+	Bot    *tgbotapi.BotAPI
 }
 
 func (t *Tapeta) Handle(update tgbotapi.Update) error {
@@ -28,7 +28,7 @@ func (t *Tapeta) Handle(update tgbotapi.Update) error {
 		return nil
 	}
 
-	log, err := t.PinchitoClient.Tapeta()
+	log, err := pinchito.Tapeta()
 	if err != nil {
 		return err
 	}
