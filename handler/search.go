@@ -12,8 +12,9 @@ import (
 )
 
 type Search struct {
-	ChatID int64
-	Bot    *tgbotapi.BotAPI
+	ChatID         int64
+	Bot            *tgbotapi.BotAPI
+	PinchitoClient pinchito.Client
 }
 
 func (s *Search) Handle(update tgbotapi.Update) error {
@@ -24,7 +25,7 @@ func (s *Search) Handle(update tgbotapi.Update) error {
 		return nil
 	}
 
-	log, err := pinchito.Search(term)
+	log, err := s.PinchitoClient.Search(term)
 	if err != nil {
 		return err
 	}
