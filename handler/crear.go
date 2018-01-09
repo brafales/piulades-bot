@@ -69,8 +69,6 @@ func (c *Crear) Handle(update tgbotapi.Update) error {
 	// If it's a CMD and it's not one of ours, this message is not for us
 	// We are also allowing "//"
 	if update.Message != nil && update.Message.IsCommand() && update.Message.Command() != "/" {
-		log.Print("Unknown CMD:" + update.Message.Command())
-		c.sendMsg(update.Message.Chat.ID, "I don't know what you mean with '/"+update.Message.Command()+"' Check the list of commands by typing '/' and disable your keyboard's auto-correct system")
 		return nil
 	}
 
