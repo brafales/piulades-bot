@@ -9,6 +9,7 @@ import (
 	pinmessage "github.com/brafales/piulades-bot/message"
 	"github.com/brafales/piulades-bot/pinchito"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
+	"errors"
 )
 
 type Crear struct {
@@ -48,7 +49,7 @@ func (c *Crear) Handle(update tgbotapi.Update) error {
 	}
 
 	match, err = c.matchCommand(cmdNewLog, update.Message)
-	if err != nil || (!match && !c.userHasLogInProgress(update.Message)) {
+	if err != nil || (!match && update.Message != nil && !c.userHasLogInProgress(update.Message)) {
 		//if we receive a message, it's not to start a new log and we have no log in progress, ignore it too
 		return err
 	}
@@ -230,6 +231,10 @@ func (c *Crear) saveLog(userId int) (string, error) {
 
 	pinLog := c.ActiveLogs[userId]
 
+	if pinLog == nil {
+		return "", errors.New("User had no log in progress")
+	}
+
 	uploadOp := &pinchito.JSONUploadOp{AuthToken: c.AuthToken, Upload: *pinLog}
 	logUrl, err := c.PinchitoClient.UploadNewLog(uploadOp)
 
@@ -367,5 +372,5 @@ func (c *Crear) GetNickFromMessage(message *tgbotapi.Message) string {
 	return nick
 }
 func (c *Crear) isPrivateMessage(message *tgbotapi.Message) (bool, error) {
-	return message.Chat.IsPrivate(), nil
+	return message== nil || message.Chat.IsPrivate(), nil
 }
