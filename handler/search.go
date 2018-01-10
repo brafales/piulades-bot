@@ -19,6 +19,9 @@ type Search struct {
 
 func (s *Search) Handle(update tgbotapi.Update) error {
 	log.Println("Handling with Search")
+	if update.Message == nil {
+		return nil
+	}
 	term := s.match(update.Message.Text)
 	if term == "" {
 		log.Println("No Search command found")

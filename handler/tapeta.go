@@ -18,6 +18,9 @@ type Tapeta struct {
 
 func (t *Tapeta) Handle(update tgbotapi.Update) error {
 	log.Println("Handling with Tapeta")
+	if update.Message == nil {
+		return nil
+	}
 	match, err := t.match(update.Message.Text)
 	if err != nil {
 		return err

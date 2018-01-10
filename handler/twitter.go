@@ -16,8 +16,9 @@ type Twitter struct {
 
 func (t *Twitter) Handle(update tgbotapi.Update) error {
 	log.Println("Handling with Twitter")
-	log.Printf("Update Message: %v\n", update.Message)
-	log.Printf("Update Message Text: %v\n", update.Message.Text)
+	if update.Message == nil {
+		return nil
+	}
 	statusID, err := twitter.GetStatusID(update.Message.Text)
 	if err != nil {
 		log.Println("No twitter link found")
