@@ -1,14 +1,15 @@
 package main
 
 import (
+	"log"
+	"net/http"
+	"os"
+
 	"github.com/brafales/piulades-bot/configuration"
 	"github.com/brafales/piulades-bot/handler"
 	"github.com/brafales/piulades-bot/pinchito"
 	"github.com/brafales/piulades-bot/twitter"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
-	"log"
-	"net/http"
-	"os"
 )
 
 func main() {
@@ -45,7 +46,6 @@ func main() {
 	log.Println("Ready to handle messages")
 	for update := range updates {
 		for _, h := range handlers {
-			log.Println("handling")
 			h.Handle(update)
 		}
 	}
