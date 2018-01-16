@@ -10,12 +10,28 @@ import (
 	"github.com/brafales/piulades-bot/pinchito"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
 	"errors"
+	"sort"
 )
+
+type messageInfo struct {
+	timestamp int
+	message tgbotapi.Message
+}
+type byTime []messageInfo
+
+func (a byTime) Len() int           { return len(a) }
+func (a byTime) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a byTime) Less(i, j int) bool { return a[i].timestamp < a[j].timestamp }
+
+type LogCreationData struct {
+	logData pinchito.PlogData
+	messages []messageInfo
+}
 
 type Crear struct {
 	ChatID         int64
 	Bot            *tgbotapi.BotAPI
-	ActiveLogs     map[int]*pinchito.PlogData
+	ActiveLogs     map[int]*LogCreationData
 	AuthToken      string
 	PinchitoClient pinchito.Client
 }
@@ -100,7 +116,7 @@ func (c *Crear) Handle(update tgbotapi.Update) error {
 
 	//This should be the last option; everything not handled before will be appended to the Log
 	if c.userHasLogInProgress(update.Message) {
-		return c.appendMessageToLog(update.Message)
+		return c.appendMessageToLog(update)
 	}
 
 	//We shouldn't get here. Don't know what to do, send instructions
@@ -156,8 +172,8 @@ func (c *Crear) startLogFromMessage(message *tgbotapi.Message) error {
 		c.sendMsg(message.Chat.ID, "You already had a log in progress. Too bad. It has been discarded")
 	}
 
-	pinLog := pinchito.PlogData{}
-	pinLog.Autor = autor.PinId
+	pinLog := LogCreationData{}
+	pinLog.logData.Autor= autor.PinId
 	c.ActiveLogs[message.From.ID] = &pinLog
 
 	c.sendMsg(message.Chat.ID, "Ready to start creating a new Log.\nForward the messages you want to add. Once finished, type /"+cmdEndLog)
@@ -174,19 +190,20 @@ func (c *Crear) endLogFromMessage(message *tgbotapi.Message) error {
 		return nil
 	}
 
-	if len(pinLog.Text) == 0 {
+	if len(pinLog.messages) == 0 {
 		c.sendMsg(message.Chat.ID, "Why do you want to create an empty log? Try harder")
 		return nil
 	}
-	pinLog.Data = time.Now().Unix()
-	pinLog.Protagonista = protagonistIdPending
+	pinLog.logData.Data = time.Now().Unix()
+	pinLog.logData.Protagonista = protagonistIdPending
 
 	c.askForTitle(message)
 
 	return nil
 }
 
-func (c *Crear) appendMessageToLog(message *tgbotapi.Message) error {
+func (c *Crear) appendMessageToLog(update tgbotapi.Update) error {
+	message := update.Message
 	if message == nil {
 		return nil
 	}
@@ -196,8 +213,7 @@ func (c *Crear) appendMessageToLog(message *tgbotapi.Message) error {
 		return nil
 	}
 
-	nick := c.GetNickFromMessage(message)
-	pinLog.Text += pinmessage.BuildNewLogLine(nick, message)
+	pinLog.messages = append(pinLog.messages, messageInfo{update.UpdateID, *message})
 
 	return nil
 }
@@ -235,7 +251,7 @@ func (c *Crear) saveLog(userId int) (string, error) {
 		return "", errors.New("User had no log in progress")
 	}
 
-	uploadOp := &pinchito.JSONUploadOp{AuthToken: c.AuthToken, Upload: *pinLog}
+	uploadOp := &pinchito.JSONUploadOp{AuthToken: c.AuthToken, Upload: pinLog.logData}
 	logUrl, err := c.PinchitoClient.UploadNewLog(uploadOp)
 
 	return logUrl, err
@@ -261,14 +277,14 @@ func (c *Crear) userHasLogWithPendingTitle(message *tgbotapi.Message) bool {
 		return false
 	}
 
-	return pinLog.Titol == titlePending
+	return pinLog.logData.Titol == titlePending
 }
 
 func (c *Crear) askForTitle(message *tgbotapi.Message) error {
 	//You can provide the title as an optional argument in cmdEndLog
 	pinLog := c.ActiveLogs[message.From.ID]
 
-	pinLog.Titol = titlePending
+	pinLog.logData.Titol = titlePending
 	c.sendMsg(message.Chat.ID, "Which title do you want the log to have?")
 
 	return nil
@@ -276,7 +292,7 @@ func (c *Crear) askForTitle(message *tgbotapi.Message) error {
 
 func (c *Crear) handleTitle(message *tgbotapi.Message) error {
 	pinLog := c.ActiveLogs[message.From.ID]
-	pinLog.Titol = message.Text
+	pinLog.logData.Titol = message.Text
 
 	return c.askForProtagonist(message)
 }
@@ -291,7 +307,7 @@ func (c *Crear) userHasLogWithPendingProtagonist(message *tgbotapi.Message) bool
 		return false
 	}
 
-	return pinLog.Protagonista == protagonistIdPending
+	return pinLog.logData.Protagonista == protagonistIdPending
 }
 
 func (c *Crear) askForProtagonist(message *tgbotapi.Message) error {
@@ -322,11 +338,13 @@ func (c *Crear) handleProtagonist(message *tgbotapi.Message) error {
 
 	pinLog := c.ActiveLogs[message.From.ID]
 
-	pinLog.Protagonista = user.PinId
+	pinLog.logData.Protagonista = user.PinId
 
 	tgMessage := tgbotapi.NewMessage(message.Chat.ID, "Using '"+user.PinNick+"' as your protagonist.")
 	tgMessage.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
 	c.Bot.Send(tgMessage)
+
+	c.sortMesagesAndCreateText(pinLog)
 
 	return c.sendLogSummary(message)
 }
@@ -341,7 +359,7 @@ func (c *Crear) sendLogSummary(message *tgbotapi.Message) error {
 
 	c.sendMsg(message.Chat.ID, "I've created the following Log:")
 
-	tgMessage := tgbotapi.NewMessage(message.Chat.ID, pinLog.Titol+" (featuring "+user.PinNick+")\n\n"+pinLog.Text)
+	tgMessage := tgbotapi.NewMessage(message.Chat.ID, pinLog.logData.Titol+" (featuring "+user.PinNick+")\n\n"+pinLog.logData.Text)
 	inlineButtons := tgbotapi.NewInlineKeyboardRow(
 		tgbotapi.NewInlineKeyboardButtonData("Save Log", keybReplySaveLog),
 		tgbotapi.NewInlineKeyboardButtonData("Discard Log", keybReplyDiscardLog))
@@ -373,4 +391,13 @@ func (c *Crear) GetNickFromMessage(message *tgbotapi.Message) string {
 }
 func (c *Crear) isPrivateMessage(message *tgbotapi.Message) (bool, error) {
 	return message== nil || message.Chat.IsPrivate(), nil
+}
+func (c *Crear) sortMesagesAndCreateText(logCreationData *LogCreationData) {
+	sort.Sort(byTime(logCreationData.messages))
+
+	for _, messageInfo := range logCreationData.messages {
+		nick := c.GetNickFromMessage(&messageInfo.message)
+		logCreationData.logData.Text += pinmessage.BuildNewLogLine(nick, &messageInfo.message)
+
+	}
 }
