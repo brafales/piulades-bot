@@ -37,7 +37,7 @@ func main() {
 	crearHandler := &handler.Crear{
 		Bot:            bot,
 		ChatID:         config.ChatID,
-		ActiveLogs:     map[int]*pinchito.PlogData{},
+		ActiveLogs:     map[int]*handler.LogCreationData{},
 		AuthToken:      config.PinchitoAuthToken,
 		PinchitoClient: pinchitoClient,
 	}
