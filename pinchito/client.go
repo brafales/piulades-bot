@@ -15,7 +15,7 @@ type Client struct {
 
 func (c *Client) Tapeta() (Log, error) {
 	log := Log{}
-	res, err := http.Get("http://" + c.PinchitoHost + "/json/random")
+	res, err := http.Get(c.PinchitoHost + "/json/random")
 	if err != nil {
 		return log, err
 	}
@@ -25,7 +25,7 @@ func (c *Client) Tapeta() (Log, error) {
 
 func (c *Client) Search(term string) (Log, error) {
 	logs := []Log{}
-	baseURL := "http://" + c.PinchitoHost + "/json/search?"
+	baseURL := c.PinchitoHost + "/json/search?"
 	params := url.Values{}
 	params.Add("s", term)
 
@@ -47,7 +47,7 @@ func (c *Client) Search(term string) (Log, error) {
 func (c *Client) UploadNewLog(uploadOp *JSONUploadOp) (string, error) {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(uploadOp)
-	res, err := http.Post("http://"+c.PinchitoHost+"/json/upload", "application/json", b)
+	res, err := http.Post(c.PinchitoHost+"/json/upload", "application/json", b)
 	if err != nil {
 		return "", err
 	}
@@ -61,7 +61,7 @@ func (c *Client) UploadNewLog(uploadOp *JSONUploadOp) (string, error) {
 		return "", errors.New("An error ocured while saving the log: " + response.ErrorMessage)
 	}
 
-	return "http://" + c.PinchitoHost + "/" + strconv.Itoa(response.IdPlog), nil
+	return c.PinchitoHost + "/" + strconv.Itoa(response.IdPlog), nil
 
 }
 
