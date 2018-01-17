@@ -6,16 +6,16 @@ import (
 	"regexp"
 	"time"
 
+	"errors"
 	pinmessage "github.com/brafales/piulades-bot/message"
 	"github.com/brafales/piulades-bot/pinchito"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
-	"errors"
 	"sort"
 )
 
 type messageInfo struct {
 	timestamp int
-	message tgbotapi.Message
+	message   tgbotapi.Message
 }
 type byTime []messageInfo
 
@@ -24,7 +24,7 @@ func (a byTime) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a byTime) Less(i, j int) bool { return a[i].timestamp < a[j].timestamp }
 
 type LogCreationData struct {
-	logData pinchito.PlogData
+	logData  pinchito.PlogData
 	messages []messageInfo
 }
 
@@ -173,7 +173,7 @@ func (c *Crear) startLogFromMessage(message *tgbotapi.Message) error {
 	}
 
 	pinLog := LogCreationData{}
-	pinLog.logData.Autor= autor.PinId
+	pinLog.logData.Autor = autor.PinId
 	c.ActiveLogs[message.From.ID] = &pinLog
 
 	c.sendMsg(message.Chat.ID, "Ready to start creating a new Log.\nForward the messages you want to add. Once finished, type /"+cmdEndLog)
@@ -281,7 +281,6 @@ func (c *Crear) userHasLogWithPendingTitle(message *tgbotapi.Message) bool {
 }
 
 func (c *Crear) askForTitle(message *tgbotapi.Message) error {
-	//You can provide the title as an optional argument in cmdEndLog
 	pinLog := c.ActiveLogs[message.From.ID]
 
 	pinLog.logData.Titol = titlePending
@@ -390,7 +389,7 @@ func (c *Crear) GetNickFromMessage(message *tgbotapi.Message) string {
 	return nick
 }
 func (c *Crear) isPrivateMessage(message *tgbotapi.Message) (bool, error) {
-	return message== nil || message.Chat.IsPrivate(), nil
+	return message == nil || message.Chat.IsPrivate(), nil
 }
 func (c *Crear) sortMesagesAndCreateText(logCreationData *LogCreationData) {
 	sort.Sort(byTime(logCreationData.messages))
