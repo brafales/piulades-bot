@@ -11,7 +11,7 @@ var tgPinchitoUsers []TgPinchitoUser
 func init() {
 	tgPinchitoUsers = []TgPinchitoUser{
 
-		{"PaRaP", 1, "PaRaP"},
+		{"parap", 1, "parap"},
 		{"rofirrim", 2, "rofi"},
 		{"SiR_RiS", 36, "[RiS]"},
 		{"frikjan", 4, "Freakhand"},
