@@ -13,7 +13,7 @@ func init() {
 
 		{"parap", 1, "parap"},
 		{"rofirrim", 2, "rofi"},
-		{"SiR_RiS", 36, "[RiS]"},
+		{"SiRRiS", 36, "[RiS]"},
 		{"frikjan", 4, "Freakhand"},
 		{"The_Bell", 18, "The_Bell"},
 		{"hexxx", 24, "hex"},
